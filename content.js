@@ -54,8 +54,6 @@ function scrapeWebsite({ contentSelector, imageRootSelector }) {
         }))
         .filter(img =>
             img.src &&
-            !img.src.startsWith("data:") &&
-            img.width > 50 &&
             img.height > 50
         );
 
