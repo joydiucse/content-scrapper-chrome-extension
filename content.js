@@ -26,8 +26,8 @@ function scrapePage() {
 
 function findLaravelNewsContentElement() {
     // 1. Try standard semantic tag
-    let el = document.querySelector('article');
-    if (el) return el;
+    let $el = $('.prose');
+    if ($el.length) return $el;
 
     // 2. Try common class names or IDs
     const commonSelectors = [
@@ -41,14 +41,12 @@ function findLaravelNewsContentElement() {
     ];
 
     for (const selector of commonSelectors) {
-        el = document.querySelector(selector);
-        if (el) return el;
+        $el = $(selector);
+        if ($el.length) return $el;
     }
 
     // 3. Fallback: Find the block element with the most text
-    // This is a simple heuristic.
-    // We can look at direct children of body or a wrapper.
-    return document.body;
+    return $('body');
 }
 
 
@@ -57,26 +55,24 @@ function scrapLaravelNews() {
     const url = window.location.href;
 
     // Strategy to find the main content
-    let contentElement = findLaravelNewsContentElement();
+    let $contentElement = $('.prose');
+
+    console.log("🚀 ~ scrapLaravelNews ~ contentElement: ", $contentElement.html());
 
     // Extract text
-    let text = "";
-    if (contentElement) {
-        text = contentElement.innerText;
-    } else {
-        text = document.body.innerText;
-    }
+    let text = $contentElement.html();
 
     // Extract images from the content element (or body if content not found)
-    const rootForImages = contentElement || document.body;
-    const imageElements = Array.from(rootForImages.querySelectorAll('img'));
-
-    const images = imageElements.map(img => ({
-        src: img.src,
-        alt: img.alt || '',
-        width: img.naturalWidth,
-        height: img.naturalHeight
-    })).filter(img => img.src && !img.src.startsWith('data:') && img.width > 50 && img.height > 50); // Filter out small icons/tracking pixels
+    const $rootForImages = ($contentElement && $contentElement.length) ? $contentElement : $('body');
+    
+    const images = $rootForImages.find('img').map(function() {
+        return {
+            src: this.src,
+            alt: this.alt || '',
+            width: this.naturalWidth,
+            height: this.naturalHeight
+        };
+    }).get().filter(img => img.src && !img.src.startsWith('data:') && img.width > 50 && img.height > 50); // Filter out small icons/tracking pixels
 
     return {
         title,

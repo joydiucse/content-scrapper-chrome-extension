@@ -1,51 +1,61 @@
-document.getElementById('scrapeBtn').addEventListener('click', async () => {
-  const statusDiv = document.getElementById('status');
-  const resultDiv = document.getElementById('result');
-  const imagePreviewDiv = document.getElementById('imagePreview');
-  
-  statusDiv.textContent = "Scraping...";
-  resultDiv.style.display = 'none';
-  imagePreviewDiv.innerHTML = '';
-
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (!tab) {
-      statusDiv.textContent = "No active tab found.";
-      return;
-    }
-
-    // Inject script if not already there (safety check, though manifest handles it for matches)
-    // For now rely on manifest content_scripts.
-    
-    chrome.tabs.sendMessage(tab.id, { action: "scrape" }, (response) => {
-      if (chrome.runtime.lastError) {
-        statusDiv.textContent = "Error: " + chrome.runtime.lastError.message + ". Try refreshing the page.";
-        return;
-      }
-
-      if (response) {
-        statusDiv.textContent = "Success!";
+$(document).ready(function() {
+    $('#scrapeBtn').on('click', async () => {
+        const $statusDiv = $('#status');
+        const $resultDiv = $('#result');
+        const $imagePreviewDiv = $('#imagePreview');
         
-        // Format output
-        const output = `Title: ${response.title}\nURL: ${response.url}\n\nContent Preview:\n${response.content}\n\nImages Found: ${response.images.length}`;
-        resultDiv.textContent = output;
-        resultDiv.style.display = 'block';
+        $statusDiv.text("Scraping...");
+        $resultDiv.hide();
+        $imagePreviewDiv.empty();
 
-        // Show image previews (first 10)
-        response.images.slice(0, 10).forEach(img => {
-          if (img.src) {
-            const imgEl = document.createElement('img');
-            imgEl.src = img.src;
-            imgEl.title = img.alt || 'Image';
-            imagePreviewDiv.appendChild(imgEl);
-          }
-        });
-      } else {
-        statusDiv.textContent = "No response from content script.";
-      }
+        try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            
+            if (!tab) {
+                $statusDiv.text("No active tab found.");
+                return;
+            }
+
+            // Inject script if not already there (safety check, though manifest handles it for matches)
+            // For now rely on manifest content_scripts.
+            
+            chrome.tabs.sendMessage(tab.id, { action: "scrape" }, (response) => {
+                if (chrome.runtime.lastError) {
+                    $statusDiv.text("Error: " + chrome.runtime.lastError.message + ". Try refreshing the page.");
+                    return;
+                }
+
+                if (response) {
+                    $statusDiv.text("Success!");
+                    
+                    // Format output
+                    const output = `
+                    <p><b>Title: </b>${response.title}</p>
+                    <p><b>URL: </b>${response.url}
+                    <p><b>Content Preview:</b></p>
+                    <div class="">
+                        ${response.fullContent}
+                    </div>
+                    <p><b>Images Found: </b>${response.images.length}</p>`;
+                    $resultDiv.html(output);
+                    $resultDiv.show();
+
+                    // Show image previews (first 10)
+                    response.images.slice(0, 10).forEach(img => {
+                        if (img.src) {
+                            const $imgEl = $('<img>', {
+                                src: img.src,
+                                title: img.alt || 'Image'
+                            });
+                            $imagePreviewDiv.append($imgEl);
+                        }
+                    });
+                } else {
+                    $statusDiv.text("No response from content script.");
+                }
+            });
+        } catch (e) {
+            $statusDiv.text("Exception: " + e.message);
+        }
     });
-  } catch (e) {
-    statusDiv.textContent = "Exception: " + e.message;
-  }
 });
