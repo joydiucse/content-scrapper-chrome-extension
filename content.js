@@ -8,46 +8,62 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ error: e.message });
         }
     }
-    // Return true to indicate we wish to send a response asynchronously (if needed),
-    // though here we are synchronous.
-    return true;
+    return true; // Allows async response
 });
 
 function scrapePage() {
     const hostname = window.location.hostname;
 
-    let content = {}
-    if (hostname.includes('laravel-news.com')) {
-        content = scrapLaravelNews()
+    if (hostname.includes("laravel-news.com")) {
+        return scrapeWebsite({
+            contentSelector: ".prose",
+            imageRootSelector: "article"
+        });
     }
-    return content;
 
+    if (hostname.includes("thehackernews.com")) {
+        return scrapeWebsite({
+            contentSelector: ".articlebody",
+            imageRootSelector: ".articlebody" // FIXED — your selector was wrong before
+        });
+    }
+
+    return { error: "Website not supported." };
 }
 
-
-
-function scrapLaravelNews() {
+/**
+ * Generic reusable scraper
+ */
+function scrapeWebsite({ contentSelector, imageRootSelector }) {
     const title = document.title;
     const url = window.location.href;
-    // Strategy to find the main content
-    let $contentElement = $('.prose');
-    // Extract text
-    let text = $contentElement.html();
-    // Extract images from the content element (or body if content not found)
-    const $rootForImages = $('article');
-    const images = $rootForImages.find('img').map(function() {
-        return {
-            src: this.src,
-            alt: this.alt || '',
-            width: this.naturalWidth,
-            height: this.naturalHeight
-        };
-    }).get().filter(img => img.src && !img.src.startsWith('data:') && img.width > 50 && img.height > 50); // Filter out small icons/tracking pixels
+
+    const contentElement = document.querySelector(contentSelector);
+    const rootForImages = document.querySelector(imageRootSelector);
+
+    // Extract content safely
+    const htmlText = contentElement?.innerHTML || "";
+
+    // Extract images
+    const images = [...(rootForImages?.querySelectorAll("img") || [])]
+        .map(img => ({
+            src: img.src,
+            alt: img.alt || "",
+            width: img.naturalWidth,
+            height: img.naturalHeight
+        }))
+        .filter(img =>
+            img.src &&
+            !img.src.startsWith("data:") &&
+            img.width > 50 &&
+            img.height > 50
+        );
+
     return {
         title,
         url,
-        content: text.substring(0, 1000) + (text.length > 1000 ? "..." : ""),
-        fullContent: text,
-        images: images
+        content: htmlText.slice(0, 1000) + (htmlText.length > 1000 ? "..." : ""),
+        fullContent: htmlText,
+        images
     };
 }
