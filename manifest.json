@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Content Scraper",
+  "version": "1.0",
+  "description": "Scrapes content and images from the current page.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
