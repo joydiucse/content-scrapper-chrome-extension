@@ -57,13 +57,11 @@ function scrapLaravelNews() {
     // Strategy to find the main content
     let $contentElement = $('.prose');
 
-    console.log("🚀 ~ scrapLaravelNews ~ contentElement: ", $contentElement.html());
-
     // Extract text
     let text = $contentElement.html();
 
     // Extract images from the content element (or body if content not found)
-    const $rootForImages = ($contentElement && $contentElement.length) ? $contentElement : $('body');
+    const $rootForImages = $('article');
     
     const images = $rootForImages.find('img').map(function() {
         return {
