@@ -24,45 +24,17 @@ function scrapePage() {
 
 }
 
-function findLaravelNewsContentElement() {
-    // 1. Try standard semantic tag
-    let $el = $('.prose');
-    if ($el.length) return $el;
-
-    // 2. Try common class names or IDs
-    const commonSelectors = [
-        '[role="main"]',
-        '.post-content',
-        '.article-content',
-        '.entry-content',
-        '#content',
-        '.content',
-        '.main'
-    ];
-
-    for (const selector of commonSelectors) {
-        $el = $(selector);
-        if ($el.length) return $el;
-    }
-
-    // 3. Fallback: Find the block element with the most text
-    return $('body');
-}
 
 
 function scrapLaravelNews() {
     const title = document.title;
     const url = window.location.href;
-
     // Strategy to find the main content
     let $contentElement = $('.prose');
-
     // Extract text
     let text = $contentElement.html();
-
     // Extract images from the content element (or body if content not found)
     const $rootForImages = $('article');
-    
     const images = $rootForImages.find('img').map(function() {
         return {
             src: this.src,
@@ -71,7 +43,6 @@ function scrapLaravelNews() {
             height: this.naturalHeight
         };
     }).get().filter(img => img.src && !img.src.startsWith('data:') && img.width > 50 && img.height > 50); // Filter out small icons/tracking pixels
-
     return {
         title,
         url,
