@@ -14,50 +14,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function scrapePage() {
-    const hostname = window.location.hostname;
+    console.log("Scraping page...");
 
-    let content = {}
-    if (hostname.includes('laravel-news.com')) {
-        content = scrapLaravelNews()
-    }
-    return content;
-
-}
-
-function findLaravelNewsContentElement() {
-    // 1. Try standard semantic tag
-    let el = document.querySelector('article');
-    if (el) return el;
-
-    // 2. Try common class names or IDs
-    const commonSelectors = [
-        '[role="main"]',
-        '.post-content',
-        '.article-content',
-        '.entry-content',
-        '#content',
-        '.content',
-        '.main'
-    ];
-
-    for (const selector of commonSelectors) {
-        el = document.querySelector(selector);
-        if (el) return el;
-    }
-
-    // 3. Fallback: Find the block element with the most text
-    // This is a simple heuristic.
-    // We can look at direct children of body or a wrapper.
-    return document.body;
-}
-
-
-function scrapLaravelNews() {
     const title = document.title;
     const url = window.location.href;
 
     // Strategy to find the main content
-    let contentElement = findLaravelNewsContentElement();
+    let contentElement = findContentElement();
 
     // Extract text
     let text = "";
@@ -85,4 +48,31 @@ function scrapLaravelNews() {
         fullContent: text,
         images: images
     };
+}
+
+function findContentElement() {
+    // 1. Try standard semantic tag
+    let el = document.querySelector('article');
+    if (el) return el;
+
+    // 2. Try common class names or IDs
+    const commonSelectors = [
+        '[role="main"]',
+        '.post-content',
+        '.article-content',
+        '.entry-content',
+        '#content',
+        '.content',
+        '.main'
+    ];
+
+    for (const selector of commonSelectors) {
+        el = document.querySelector(selector);
+        if (el) return el;
+    }
+
+    // 3. Fallback: Find the block element with the most text
+    // This is a simple heuristic.
+    // We can look at direct children of body or a wrapper.
+    return document.body;
 }
