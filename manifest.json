@@ -3,7 +3,7 @@
   "name": "Content Scraper",
   "version": "1.0",
   "description": "Scrapes content and images from the current page.",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "tabs"],
   "host_permissions": ["http://localhost:8000/*", "<all_urls>"],
   "action": {
     "default_popup": "popup.html"

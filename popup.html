@@ -22,6 +22,14 @@
   <div id="status"></div>
   <div id="result"></div>
   <div class="image-preview" id="imagePreview"></div>
+  <hr style="margin:10px 0; border: none; border-top: 1px solid #ddd;" />
+  <h4 style="margin:6px 0 8px;">Manual Submit</h4>
+  <div style="display:grid; gap:6px;">
+    <input id="manualLink" type="url" placeholder="Link (source URL)" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px;" />
+    <input id="manualTitle" type="text" placeholder="Title" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px;" />
+    <textarea id="manualContent" placeholder="Content" rows="4" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px;"></textarea>
+    <button id="sendBtn" style="width:90px; padding:8px; cursor:pointer; background-color:#0a7cff; color:white; border:none; border-radius:4px; font-weight:500;">Send</button>
+  </div>
   <script src="jquery.min.js"></script>
   <script src="popup.js"></script>
 </body>

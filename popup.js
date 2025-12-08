@@ -1,6 +1,12 @@
 const API_URL = 'http://localhost:8000/api/posts'
 
-$(document).ready(function() {
+$(document).ready(async function() {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab && tab.url) {
+            $('#manualLink').val(tab.url);
+        }
+    } catch (_) {}
     $('#scrapeBtn').on('click', async () => {
         const $statusDiv = $('#status');
         const $resultDiv = $('#result');
@@ -99,4 +105,40 @@ $(document).ready(function() {
             $statusDiv.text("Exception: " + e.message);
         }
     });
+
+    $('#sendBtn').on('click', async () => {
+        const $statusDiv = $('#status')
+        const link = ($('#manualLink').val() || '').toString().trim()
+        const title = ($('#manualTitle').val() || '').toString().trim()
+        const content = ($('#manualContent').val() || '').toString().trim()
+        if (!link || !title) {
+            $statusDiv.text('Please provide link and title')
+            return
+        }
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    title,
+                    content,
+                    source: 'Link',
+                    source_url: link,
+                    image_urls: [],
+                    status: 'draft',
+                    kind: 'blog',
+                }),
+            })
+            const json = await res.json()
+            if (json && json.ok) {
+                $statusDiv.text('Saved to server (id: ' + json.id + ')')
+            } else if (json && json.duplicate) {
+                $statusDiv.text('Already exists (id: ' + json.id + ')')
+            } else {
+                $statusDiv.text(json && json.message ? ('Error: ' + json.message) : 'Save response error')
+            }
+        } catch (err) {
+            $statusDiv.text('Failed to save: ' + err.message)
+        }
+    })
 });
