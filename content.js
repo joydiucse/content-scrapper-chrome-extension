@@ -16,6 +16,7 @@ function scrapePage() {
 
     if (hostname.includes("laravel-news.com")) {
         return scrapeWebsite({
+            source:'Laravel News',
             contentSelector: ".prose",
             imageRootSelector: "article"
         });
@@ -23,6 +24,7 @@ function scrapePage() {
 
     if (hostname.includes("thehackernews.com")) {
         return scrapeWebsite({
+            source:'The Hacker News',
             contentSelector: ".articlebody",
             imageRootSelector: ".articlebody" // FIXED — your selector was wrong before
         });
@@ -34,7 +36,7 @@ function scrapePage() {
 /**
  * Generic reusable scraper
  */
-function scrapeWebsite({ contentSelector, imageRootSelector }) {
+function scrapeWebsite({source, contentSelector, imageRootSelector }) {
     const title = document.title;
     const url = window.location.href;
 
@@ -62,6 +64,7 @@ function scrapeWebsite({ contentSelector, imageRootSelector }) {
         url,
         content: htmlText.slice(0, 1000) + (htmlText.length > 1000 ? "..." : ""),
         fullContent: htmlText,
-        images
+        images,
+        source
     };
 }

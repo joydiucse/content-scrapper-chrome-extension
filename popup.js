@@ -1,3 +1,5 @@
+const API_URL = 'http://localhost:8000/api/posts'
+
 $(document).ready(function() {
     $('#scrapeBtn').on('click', async () => {
         const $statusDiv = $('#status');
@@ -19,7 +21,7 @@ $(document).ready(function() {
             // Inject script if not already there (safety check, though manifest handles it for matches)
             // For now rely on manifest content_scripts.
 
-            chrome.tabs.sendMessage(tab.id, { action: "scrape" }, (response) => {
+            chrome.tabs.sendMessage(tab.id, { action: "scrape" }, async (response) => {
                 if (chrome.runtime.lastError) {
                     $statusDiv.text("Error: " + chrome.runtime.lastError.message + ". Try refreshing the page.");
                     return;
@@ -55,6 +57,34 @@ $(document).ready(function() {
                             $imagePreviewDiv.append($imgEl);
                         }
                     });
+
+                    try {
+                        const srcUrl = response.url || '';
+                        let srcName = '';
+                        const res = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                title: response.title || 'Untitled',
+                                content: response.fullContent || '',
+                                source: response.source,
+                                source_url: srcUrl,
+                                status: 'draft',
+                                kind: 'blog',
+                            }),
+                        });
+                        const json = await res.json();
+                        if (json && json.ok) {
+                            $statusDiv.text("Saved to server (id: " + json.id + ")");
+                        } else {
+                            $statusDiv.text("Save response error");
+                        }
+                    } catch (err) {
+                        $statusDiv.text("Failed to save: " + err.message);
+                    }
                 } else {
                     $statusDiv.text("No response from content script.");
                 }
