@@ -83,8 +83,10 @@ $(document).ready(function() {
                         const json = await res.json();
                         if (json && json.ok) {
                             $statusDiv.text("Saved to server (id: " + json.id + ")");
+                        } else if (json && json.duplicate) {
+                            $statusDiv.text("Already exists (id: " + json.id + ")");
                         } else {
-                            $statusDiv.text("Save response error");
+                            $statusDiv.text(json && json.message ? ("Error: " + json.message) : "Save response error");
                         }
                     } catch (err) {
                         $statusDiv.text("Failed to save: " + err.message);
