@@ -60,21 +60,25 @@ $(document).ready(function() {
 
                     try {
                         const srcUrl = response.url || '';
-                        let srcName = '';
+                        const srcName = response.source || '';
+
+                        const imageSrcs = (response.images || [])
+                          .map(i => i.src)
+                          .filter(u => /^https?:\/\//.test(u))
+                          .slice(0, 10);
+
                         const res = await fetch(API_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                title: response.title || 'Untitled',
-                                content: response.fullContent || '',
-                                source: response.source,
-                                source_url: srcUrl,
-                                status: 'draft',
-                                kind: 'blog',
-                            }),
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                          body: JSON.stringify({
+                            title: response.title || 'Untitled',
+                            content: response.fullContent || '',
+                            source: srcName,
+                            source_url: srcUrl,
+                            image_urls: imageSrcs,
+                            status: 'draft',
+                            kind: 'blog',
+                          }),
                         });
                         const json = await res.json();
                         if (json && json.ok) {
