@@ -5,8 +5,19 @@
   <style>
     body { width: 350px; padding: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     h3 { margin-top: 0; color: #333; }
-    button#scrapeBtn { width: 64px; padding: 10px; cursor: pointer; background-color: #f55247; color: white; border: none; border-radius: 4px; font-weight: bold; margin-bottom: 10px; }
-    button#scrapeBtn:hover { background-color: #d14036; }
+    .btn-group { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+    button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; color: white; }
+    .btn-scrap { background-color: #f55247; }
+    .btn-scrap:hover { background-color: #d14036; }
+    .btn-scrap-send { background-color: #e64a19; } /* Darker Orange/Red */
+    .btn-scrap-send:hover { background-color: #d84315; }
+    .btn-send-link { background-color: #009688; } /* Teal */
+    .btn-send-link:hover { background-color: #00796b; }
+    .btn-send-scraped { background-color: #4caf50; margin-top: 10px; width: 100%; display: none; } /* Green */
+    .btn-send-scraped:hover { background-color: #388e3c; }
+    .btn-manual-send { background-color: #0a7cff; width: 90px; }
+    .btn-manual-send:hover { background-color: #0069d9; }
+    
     #result { margin-top: 10px; font-size: 12px; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; display: none; background: #f9f9f9; border-radius: 4px; }
     .image-preview { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
     .image-preview img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
@@ -18,17 +29,26 @@
 </head>
 <body>
   <h3>Content Scraper</h3>
-  <button id="scrapeBtn">Scrape</button>
+  <div class="btn-group">
+    <button id="scrapeBtn" class="btn-scrap">Scrap</button>
+    <button id="scrapeSendBtn" class="btn-scrap-send">Scrap & Send</button>
+    <button id="sendLinkBtn" class="btn-send-link">Send Link</button>
+  </div>
+  
   <div id="status"></div>
+  <button id="sendScrapedBtn" class="btn-send-scraped">Send Scraped Data</button>
+  
   <div id="result"></div>
   <div class="image-preview" id="imagePreview"></div>
-  <hr style="margin:10px 0; border: none; border-top: 1px solid #ddd;" />
+  
+  <hr style="margin:15px 0; border: none; border-top: 1px solid #ddd;" />
+  
   <h4 style="margin:6px 0 8px;">Manual Submit</h4>
   <div style="display:grid; gap:6px;">
-    <input id="manualLink" type="url" placeholder="Link (source URL)" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px;" />
-    <input id="manualTitle" type="text" placeholder="Title" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px;" />
-    <textarea id="manualContent" placeholder="Content" rows="4" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px;"></textarea>
-    <button id="sendBtn" style="width:90px; padding:8px; cursor:pointer; background-color:#0a7cff; color:white; border:none; border-radius:4px; font-weight:500;">Send</button>
+    <input id="manualLink" type="url" placeholder="Link (source URL)" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px; box-sizing: border-box;" />
+    <input id="manualTitle" type="text" placeholder="Title" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px; box-sizing: border-box;" />
+    <textarea id="manualContent" placeholder="Content" rows="4" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px; box-sizing: border-box;"></textarea>
+    <button id="sendBtn" class="btn-manual-send">Send</button>
   </div>
   <script src="jquery.min.js"></script>
   <script src="popup.js"></script>
